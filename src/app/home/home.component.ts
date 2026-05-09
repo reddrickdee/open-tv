@@ -102,6 +102,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
   nodeStack: Stack = new Stack();
   showScrollTop = false;
   epgNowMap: Map<number, string> = new Map();
+  private epgChannelCache: Map<number, Channel> = new Map();
 
   scrollToTop() {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -273,6 +274,22 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
     }
     try {
       let channels: Channel[] = await invoke("search", { filters: this.filters });
+      // EPG-aware search: supplement SQL results with channels whose now-playing program matches
+      if (!more && this.filters?.query && this.epgNowMap.size > 0) {
+        const query = this.filters.query.toLowerCase();
+        const existingIds = new Set(channels.map((ch) => ch.id));
+        this.epgNowMap.forEach((programTitle, channelId) => {
+          if (
+            programTitle.toLowerCase().includes(query) &&
+            !existingIds.has(channelId)
+          ) {
+            const cached = this.epgChannelCache.get(channelId);
+            if (cached) {
+              channels.push(cached);
+            }
+          }
+        });
+      }
       if (!more) {
         this.channels = channels;
         this.channelsVisible = true;
@@ -308,6 +325,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
           const nowPlaying = epgData.find((e) => e.now_playing);
           if (nowPlaying) {
             this.epgNowMap.set(channel.id!, nowPlaying.title);
+            this.epgChannelCache.set(channel.id!, channel);
           }
         } catch {
           // EPG not available for this channel — skip silently
