@@ -43,6 +43,7 @@ import { Stack } from "../models/stack";
 
 import { BulkActionType } from '../models/bulkActionType';
 import { SidebarSelection } from '../sidebar/sidebar.component';
+import { EPG } from '../models/epg';
 
 @Component({
   selector: "app-home",
@@ -100,6 +101,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
   loading = false;
   nodeStack: Stack = new Stack();
   showScrollTop = false;
+  epgNowMap: Map<number, string> = new Map();
 
   scrollToTop() {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -284,6 +286,35 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
       this.error.handleError(e);
     }
     this.loading = false;
+    // Fire-and-forget: fetch EPG for visible livestream channels
+    this.fetchEpgForVisibleChannels();
+  }
+
+  async fetchEpgForVisibleChannels() {
+    const livestreams = this.channels.filter(
+      (ch) =>
+        ch.media_type === MediaType.livestream &&
+        this.memory.XtreamSourceIds.has(ch.source_id!) &&
+        !this.memory.CustomSourceIds?.has(ch.source_id!)
+    );
+    if (livestreams.length === 0) return;
+
+    const BATCH_SIZE = 5;
+    for (let i = 0; i < livestreams.length; i += BATCH_SIZE) {
+      const batch = livestreams.slice(i, i + BATCH_SIZE);
+      const promises = batch.map(async (channel) => {
+        try {
+          const epgData: EPG[] = await invoke("get_epg", { channel });
+          const nowPlaying = epgData.find((e) => e.now_playing);
+          if (nowPlaying) {
+            this.epgNowMap.set(channel.id!, nowPlaying.title);
+          }
+        } catch {
+          // EPG not available for this channel — skip silently
+        }
+      });
+      await Promise.all(promises);
+    }
   }
 
   checkScrollTop() {

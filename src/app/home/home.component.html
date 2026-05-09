@@ -93,7 +93,7 @@
     <!-- Channel Grid -->
     <div class="channel-grid" [@fade]="channelsVisible ? 'visible' : 'hidden'">
       <app-channel-tile [attr.id]="i == 0 ? 'first' : null" *ngFor="let channel of channels; let i = index"
-        [id]="i" [channel]="channel" [viewMode]="viewType"></app-channel-tile>
+        [id]="i" [channel]="channel" [viewMode]="viewType" [epgNow]="epgNowMap.get(channel.id!)"></app-channel-tile>
     </div>
 
     <button [@fade]="channelsVisible ? 'visible' : 'hidden'" *ngIf="reachedMax === false" (click)="loadMore()"

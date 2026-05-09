@@ -103,6 +103,17 @@
   white-space: nowrap;
 }
 
+.channel-epg-now {
+  font-size: 0.7rem;
+  color: var(--color-live);
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  margin-top: 1px;
+  font-weight: 500;
+  opacity: 0.85;
+}
+
 /* ─── Status Icons ─── */
 .archive-icon {
   width: 1rem;
