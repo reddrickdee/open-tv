@@ -129,6 +129,8 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
         this.memory.trayEnabled = settings.enable_tray_icon ?? true;
         this.memory.AlwaysAskSave = settings.always_ask_save ?? false;
         this.memory.Sources = new Map(sources.filter((x) => x.enabled).map(s => [s.id!, s]));
+        // Notify sidebar to load category groups now that Sources are populated
+        this.memory.RefreshSources.next(true);
         if (sources.length == 0) this.reset();
         else {
           getVersion().then((version) => {
