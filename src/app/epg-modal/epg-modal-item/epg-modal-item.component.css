@@ -1,14 +1,20 @@
 .epg-item {
-  border-radius: 0.25rem;
-  background-color: #343a40;
+  border-radius: var(--radius-md);
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
   width: 100%;
   padding: 1rem;
   position: relative;
+  transition: all var(--transition-fast);
+}
+
+.epg-item:hover {
+  background-color: var(--bg-surface-hover);
 }
 
 .thin-line {
   height: 1px;
-  background-color: white;
+  background: var(--border-subtle);
   width: 100%;
   margin: 0;
 }
@@ -17,16 +23,26 @@
   height: 2rem;
   width: 2rem;
   cursor: pointer;
-  transition: transform 0.3s ease;
-  color: white;
+  transition: all var(--transition-fast);
+  color: var(--text-secondary);
+}
+
+.bell:hover {
+  color: var(--accent-primary);
+  transform: scale(1.1);
 }
 
 .timeshift {
   height: 2rem;
   width: 2rem;
   cursor: pointer;
-  transition: transform 0.3s ease;
-  color: white;
+  transition: all var(--transition-fast);
+  color: var(--text-secondary);
+}
+
+.timeshift:hover {
+  color: var(--accent-primary);
+  transform: scale(1.1);
 }
 
 .loading {
@@ -38,8 +54,9 @@
   height: 0.75rem;
   width: 0.75rem;
   border-radius: 50%;
-  background-color: red;
+  background-color: var(--success-color);
   animation: pulsate 1.5s infinite ease-in-out;
+  box-shadow: 0 0 8px rgba(34, 197, 94, 0.5);
 }
 
 @keyframes pulsate {
@@ -48,7 +65,7 @@
     opacity: 1;
   }
   50% {
-    transform: scale(1.2);
+    transform: scale(1.3);
     opacity: 0.7;
   }
   100% {

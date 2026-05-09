@@ -42,6 +42,8 @@ import { NodeType } from "../models/nodeType";
 import { Stack } from "../models/stack";
 
 import { BulkActionType } from '../models/bulkActionType';
+import { SidebarCategoryEvent } from '../sidebar/sidebar.component';
+import { EPG } from '../models/epg';
 
 @Component({
   selector: "app-home",
@@ -99,6 +101,8 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
   loading = false;
   nodeStack: Stack = new Stack();
   showScrollTop = false;
+  epgMap: Map<number, EPG> = new Map();
+  private epgTimer: any;
 
   scrollToTop() {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -279,6 +283,9 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
         this.channels = this.channels.concat(channels);
       }
       this.reachedMax = channels.length < this.PAGE_SIZE;
+      if (!more) {
+        this.startEpgTimer();
+      }
     } catch (e) {
       this.error.handleError(e);
     }
@@ -449,6 +456,63 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
     this.clearSearch();
     this.nodeStack.clear();
     await this.load();
+  }
+
+  async onCategorySelected(event: SidebarCategoryEvent) {
+    if (this.filters?.view_type !== ViewMode.Categories) {
+      this.filters!.view_type = ViewMode.Categories;
+    }
+    this.filters!.series_id = undefined;
+    this.filters!.season = undefined;
+    this.filters!.group_id = event.groupId;
+    this.nodeStack.clear();
+    this.nodeStack.add(
+      new Node(event.groupId, "", NodeType.Category, undefined, ViewMode.Categories)
+    );
+    this.clearSearch();
+    await this.load();
+  }
+
+  async loadBatchEpg() {
+    if (!this.channels?.length) return;
+    const livestreamChannels = this.channels.filter(
+      (c) => c.media_type === MediaType.livestream && c.stream_id && c.source_id
+    );
+    if (!livestreamChannels.length) return;
+
+    const channelRequests = livestreamChannels
+      .filter((c) => this.memory.XtreamSourceIds.has(c.source_id!))
+      .slice(0, 20)
+      .map((c) => ({ stream_id: c.stream_id!, source_id: c.source_id!, channel_id: c.id! }));
+
+    if (!channelRequests.length) return;
+
+    try {
+      const results: Array<{ channel_id: number; epg: EPG }> = await invoke(
+        "get_current_epg_batch",
+        { channels: channelRequests }
+      );
+      const newMap = new Map<number, EPG>();
+      for (const r of results) {
+        newMap.set(r.channel_id, r.epg);
+      }
+      this.epgMap = newMap;
+    } catch (_) {
+      // EPG batch not available or failed - graceful degradation
+    }
+  }
+
+  private startEpgTimer() {
+    this.stopEpgTimer();
+    this.loadBatchEpg();
+    this.epgTimer = setInterval(() => this.loadBatchEpg(), 60000);
+  }
+
+  private stopEpgTimer() {
+    if (this.epgTimer) {
+      clearInterval(this.epgTimer);
+      this.epgTimer = null;
+    }
   }
 
   searchFocused(): boolean {
@@ -631,6 +695,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
 
   ngOnDestroy() {
     this.subscriptions.forEach((x) => x.unsubscribe());
+    this.stopEpgTimer();
   }
 
   async toggleKeywords() {
