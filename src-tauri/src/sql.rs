@@ -1546,7 +1546,7 @@ fn row_to_custom_channel(row: &Row) -> Result<CustomChannel, rusqlite::Error> {
     })
 }
 
-fn get_groups_by_source_id(id: i64) -> Result<Vec<Group>> {
+pub fn get_groups_by_source_id(id: i64) -> Result<Vec<Group>> {
     let sql = get_conn()?;
     let result = sql
         .prepare(

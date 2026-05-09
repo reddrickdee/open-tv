@@ -42,6 +42,7 @@ import { NodeType } from "../models/nodeType";
 import { Stack } from "../models/stack";
 
 import { BulkActionType } from '../models/bulkActionType';
+import { SidebarSelection } from '../sidebar/sidebar.component';
 
 @Component({
   selector: "app-home",
@@ -449,6 +450,20 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
     this.clearSearch();
     this.nodeStack.clear();
     await this.load();
+  }
+
+  async onSidebarSelection(selection: SidebarSelection) {
+    if (selection.type === 'view') {
+      await this.switchMode(selection.viewMode!);
+    } else if (selection.type === 'category') {
+      this.filters!.series_id = undefined;
+      this.filters!.season = undefined;
+      this.filters!.view_type = ViewMode.Categories;
+      this.filters!.group_id = selection.groupId;
+      this.clearSearch();
+      this.nodeStack.clear();
+      await this.load();
+    }
   }
 
   searchFocused(): boolean {

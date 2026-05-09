@@ -1,32 +1,44 @@
 .epg-item {
-  border-radius: 0.25rem;
-  background-color: #343a40;
+  border-radius: var(--radius-md);
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
   width: 100%;
   padding: 1rem;
   position: relative;
+  transition: border-color var(--transition-fast);
 }
 
 .thin-line {
   height: 1px;
-  background-color: white;
+  background-color: var(--border-medium);
   width: 100%;
   margin: 0;
 }
 
 .bell {
-  height: 2rem;
-  width: 2rem;
+  height: 1.75rem;
+  width: 1.75rem;
   cursor: pointer;
-  transition: transform 0.3s ease;
-  color: white;
+  transition: transform 0.3s ease, color var(--transition-fast);
+  color: var(--text-secondary);
+}
+
+.bell:hover {
+  color: var(--accent-primary);
+  transform: scale(1.1);
 }
 
 .timeshift {
-  height: 2rem;
-  width: 2rem;
+  height: 1.75rem;
+  width: 1.75rem;
   cursor: pointer;
-  transition: transform 0.3s ease;
-  color: white;
+  transition: transform 0.3s ease, color var(--transition-fast);
+  color: var(--text-secondary);
+}
+
+.timeshift:hover {
+  color: var(--accent-primary);
+  transform: scale(1.1);
 }
 
 .loading {
@@ -35,11 +47,12 @@
 }
 
 .live {
-  height: 0.75rem;
-  width: 0.75rem;
+  height: 0.65rem;
+  width: 0.65rem;
   border-radius: 50%;
-  background-color: red;
+  background-color: var(--color-live);
   animation: pulsate 1.5s infinite ease-in-out;
+  box-shadow: 0 0 6px var(--color-live);
 }
 
 @keyframes pulsate {
@@ -48,7 +61,7 @@
     opacity: 1;
   }
   50% {
-    transform: scale(1.2);
+    transform: scale(1.3);
     opacity: 0.7;
   }
   100% {

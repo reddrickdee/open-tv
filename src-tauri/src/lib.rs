@@ -115,7 +115,8 @@ pub fn run() {
             hide_channel,
             hide_group,
             remove_from_history,
-            get_all_expiries
+            get_all_expiries,
+            get_groups_for_source
         ])
         .setup(|app| {
             app.manage(Mutex::new(AppState {
@@ -568,4 +569,9 @@ async fn cancel_play(
 #[tauri::command]
 async fn get_all_expiries() -> Result<HashMap<i64, i64>, String> {
     xtream::get_all_expiries().await.map_err(map_err_frontend)
+}
+
+#[tauri::command(async)]
+fn get_groups_for_source(source_id: i64) -> Result<Vec<Group>, String> {
+    sql::get_groups_by_source_id(source_id).map_err(map_err_frontend)
 }
