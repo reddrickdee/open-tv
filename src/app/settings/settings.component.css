@@ -5,20 +5,28 @@
     width: 2.5rem;
     height: 2.5rem;
     cursor: pointer;
-    transition: transform 0.3s ease;
+    transition: all var(--transition-fast);
+    color: var(--text-secondary);
 }
 
 .arrow:hover {
-    transform: scale(125%);
+    transform: scale(1.15);
+    color: var(--accent-primary);
 }
 
 .author {
     text-align: center;
     font-size: 1rem;
+    color: var(--text-secondary);
 }
 
 a {
     text-decoration: none;
+    color: var(--accent-primary);
+}
+
+a:hover {
+    color: var(--accent-primary-hover);
 }
 
 .btn.disabled {
@@ -30,11 +38,11 @@ button .refresh {
     height: 1.5rem;
     width: 1.5rem;
     transition: transform 0.3s ease;
-  }
-  
-  button:hover .refresh {
+}
+
+button:hover .refresh {
     transform: rotate(360deg);
-  }
+}
 
 button .plus {
     width: 1.5rem;
@@ -71,3 +79,28 @@ button:hover .history {
     width: 1rem;
 }
 
+:host ::ng-deep .form-control {
+    background-color: var(--bg-surface) !important;
+    border: 1px solid var(--border-medium) !important;
+    color: var(--text-primary) !important;
+}
+
+:host ::ng-deep .form-select {
+    background-color: var(--bg-surface) !important;
+    border: 1px solid var(--border-medium) !important;
+    color: var(--text-primary) !important;
+}
+
+:host ::ng-deep .card {
+    background-color: var(--bg-surface) !important;
+    border: 1px solid var(--border-subtle) !important;
+    border-radius: var(--radius-md) !important;
+}
+
+:host ::ng-deep h5 {
+    color: var(--text-primary);
+}
+
+:host ::ng-deep label {
+    color: var(--text-secondary);
+}

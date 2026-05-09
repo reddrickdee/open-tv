@@ -95,6 +95,7 @@ pub fn run() {
             channel_exists,
             update_source,
             get_epg,
+            get_current_epg_batch,
             download,
             add_epg,
             remove_epg,
@@ -430,6 +431,15 @@ fn update_source(source: Source) -> Result<(), String> {
 #[tauri::command]
 async fn get_epg(channel: Channel) -> Result<Vec<EPG>, String> {
     xtream::get_epg(channel).await.map_err(map_err_frontend)
+}
+
+#[tauri::command]
+async fn get_current_epg_batch(
+    channels: Vec<HashMap<String, serde_json::Value>>,
+) -> Result<Vec<HashMap<String, serde_json::Value>>, String> {
+    xtream::get_current_epg_batch(channels)
+        .await
+        .map_err(map_err_frontend)
 }
 
 #[tauri::command]

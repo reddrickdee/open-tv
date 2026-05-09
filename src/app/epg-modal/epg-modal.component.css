@@ -1,17 +1,33 @@
 .epg-item {
-  border-radius: 0.25rem;
-  background-color: #343a40;
+  border-radius: var(--radius-md);
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
   width: 100%;
   padding: 1rem;
   position: relative;
+  transition: all var(--transition-fast);
+}
+
+.epg-item:hover {
+  background-color: var(--bg-surface-hover);
+  border-color: var(--border-medium);
 }
 
 .arrow {
   width: 3rem;
   height: 3rem;
   cursor: pointer;
+  color: var(--accent-primary);
+  transition: all var(--transition-fast);
+}
+
+.arrow:hover {
+  transform: scale(1.1);
+  color: var(--accent-primary-hover);
 }
 
 .date-text {
   font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
 }

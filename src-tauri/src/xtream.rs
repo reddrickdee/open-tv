@@ -615,3 +615,77 @@ pub async fn get_all_expiries() -> Result<HashMap<i64, i64>> {
         .collect();
     Ok(statuses)
 }
+
+pub async fn get_current_epg_batch(
+    channels: Vec<HashMap<String, serde_json::Value>>,
+) -> Result<Vec<HashMap<String, serde_json::Value>>> {
+    let mut results = Vec::new();
+    let mut source_channels: HashMap<i64, Vec<(u64, i64)>> = HashMap::new();
+
+    for ch in &channels {
+        let source_id = ch
+            .get("source_id")
+            .and_then(|v| v.as_i64())
+            .unwrap_or(0);
+        let stream_id = ch
+            .get("stream_id")
+            .and_then(|v| v.as_u64())
+            .unwrap_or(0);
+        let channel_id = ch
+            .get("channel_id")
+            .and_then(|v| v.as_i64())
+            .unwrap_or(0);
+        source_channels
+            .entry(source_id)
+            .or_default()
+            .push((stream_id, channel_id));
+    }
+
+    for (source_id, channel_list) in source_channels {
+        let source_result = sql::get_source_from_id(source_id);
+        let mut source = match source_result {
+            Ok(s) => s,
+            Err(_) => continue,
+        };
+        let url_result = build_xtream_url(&mut source);
+        let base_url = match url_result {
+            Ok(u) => u,
+            Err(_) => continue,
+        };
+        let user_agent = get_user_agent_from_source(&source).unwrap_or_default();
+
+        for (stream_id, channel_id) in channel_list {
+            let mut url = base_url.clone();
+            url.query_pairs_mut()
+                .append_pair("stream_id", &stream_id.to_string());
+            let epg_result: std::result::Result<XtreamEPG, _> =
+                get_xtream_http_data(url, GET_EPG, &user_agent).await;
+            if let Ok(epg) = epg_result {
+                let timeshift_url = get_timeshift_url_base(&source).ok();
+                for item in epg.epg_listings {
+                    let parsed = xtream_epg_to_epg(
+                        item,
+                        timeshift_url.as_ref().unwrap_or(&base_url),
+                        &stream_id.to_string(),
+                    );
+                    if let Ok(epg_item) = parsed {
+                        if epg_item.now_playing {
+                            let mut map = HashMap::new();
+                            map.insert(
+                                "channel_id".to_string(),
+                                serde_json::Value::Number(channel_id.into()),
+                            );
+                            map.insert(
+                                "epg".to_string(),
+                                serde_json::to_value(&epg_item)?,
+                            );
+                            results.push(map);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    Ok(results)
+}
