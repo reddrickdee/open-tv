@@ -467,7 +467,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
     this.filters!.group_id = event.groupId;
     this.nodeStack.clear();
     this.nodeStack.add(
-      new Node(event.groupId, "", NodeType.Category, undefined, ViewMode.Categories)
+      new Node(event.groupId, event.name, NodeType.Category, undefined, ViewMode.Categories)
     );
     this.clearSearch();
     await this.load();
