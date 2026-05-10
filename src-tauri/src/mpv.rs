@@ -196,10 +196,12 @@ fn get_play_args(
         set_headers(headers, &mut args, source);
     }
     if let Some(mpv_params) = settings.mpv_params {
-        #[cfg(not(target_os = "windows"))]
+        #[cfg(any(target_os = "linux", target_os = "macos"))]
         let mut params = shell_words::split(&mpv_params)?;
         #[cfg(target_os = "windows")]
         let mut params = winsplit::split(&mpv_params);
+        #[cfg(not(any(target_os = "linux", target_os = "macos", target_os = "windows")))]
+        let mut params: Vec<String> = mpv_params.split_whitespace().map(String::from).collect();
         args.append(&mut params);
     }
     Ok(args)
