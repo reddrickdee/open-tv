@@ -9,6 +9,7 @@ import { MemoryService } from "../memory.service";
 export interface SidebarCategoryEvent {
   groupId: number;
   sourceId: number;
+  name: string;
 }
 
 @Component({
@@ -48,8 +49,8 @@ export class SidebarComponent {
     this.viewModeChanged.emit(mode);
   }
 
-  selectCategory(groupId: number, sourceId: number) {
-    this.categorySelected.emit({ groupId, sourceId });
+  selectCategory(groupId: number, sourceId: number, name: string) {
+    this.categorySelected.emit({ groupId, sourceId, name });
   }
 
   toggleMediaType(type: MediaType) {

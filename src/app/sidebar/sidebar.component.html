@@ -83,7 +83,7 @@
         </button>
         <div class="category-list" *ngIf="expandedSources.has(entry.key)">
           <button *ngFor="let group of sourceCategories.get(entry.key)"
-            class="category-item" (click)="selectCategory(group.id!, entry.key)">
+            class="category-item" (click)="selectCategory(group.id!, entry.key, group.name || '')">
             {{ group.name }}
           </button>
           <div class="category-empty" *ngIf="!sourceCategories.get(entry.key)?.length">
