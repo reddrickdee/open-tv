@@ -103,6 +103,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
   showScrollTop = false;
   epgNowMap: Map<number, string> = new Map();
   private epgChannelCache: Map<number, Channel> = new Map();
+  private epgTimerInterval: any = null;
 
   scrollToTop() {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -695,6 +696,21 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
   closeContextMenu() {
     if (this.memory.currentContextMenu?.menuOpen) {
       this.memory.currentContextMenu?.closeMenu();
+    }
+  }
+
+  startEpgTimer() {
+    this.stopEpgTimer();
+    // Refresh EPG now-playing data every 60 seconds
+    this.epgTimerInterval = setInterval(() => {
+      this.fetchEpgForVisibleChannels();
+    }, 60000);
+  }
+
+  stopEpgTimer() {
+    if (this.epgTimerInterval) {
+      clearInterval(this.epgTimerInterval);
+      this.epgTimerInterval = null;
     }
   }
 
