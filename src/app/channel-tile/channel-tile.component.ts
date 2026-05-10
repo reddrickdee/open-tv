@@ -63,6 +63,18 @@ export class ChannelTileComponent implements OnDestroy, AfterViewInit {
   subscriptions: Subscription[] = [];
   fade = false;
 
+  get epgProgress(): number {
+    if (!this.currentEpg) return 0;
+    const now = Math.floor(Date.now() / 1000);
+    const start = this.currentEpg.start_timestamp;
+    const endMatch = this.currentEpg.end_time;
+    if (!start || !endMatch) return 0;
+    const duration = 3600;
+    const elapsed = now - start;
+    if (elapsed <= 0) return 0;
+    return Math.min(100, Math.round((elapsed / duration) * 100));
+  }
+
   ngAfterViewInit(): void {
     this.getExistingDownload();
   }

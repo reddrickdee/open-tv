@@ -69,10 +69,27 @@
   overflow: hidden;
 }
 
+.epg-progress {
+  width: 100%;
+  height: 3px;
+  background: var(--border-subtle);
+  border-radius: 2px;
+  margin-top: 0.3rem;
+  overflow: hidden;
+}
+
+.epg-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-primary), #a78bfa);
+  border-radius: 2px;
+  transition: width 1s linear;
+}
+
 .channel-image {
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
+  border-radius: 6px;
 }
 
 /* ─── Text Content ─── */

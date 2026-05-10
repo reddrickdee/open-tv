@@ -42,7 +42,7 @@ button .refresh {
 
   button:hover .refresh {
     transform: rotate(360deg);
-  }
+}
 
 button .plus {
     width: 1.5rem;

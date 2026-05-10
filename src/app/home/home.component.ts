@@ -301,6 +301,9 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
         this.channels = this.channels.concat(channels);
       }
       this.reachedMax = channels.length < this.PAGE_SIZE;
+      if (!more) {
+        this.startEpgTimer();
+      }
     } catch (e) {
       this.error.handleError(e);
     }
@@ -697,6 +700,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
 
   ngOnDestroy() {
     this.subscriptions.forEach((x) => x.unsubscribe());
+    this.stopEpgTimer();
   }
 
   async toggleKeywords() {
